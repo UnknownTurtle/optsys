@@ -1,4 +1,5 @@
 import csv
+import plotly.graph_objects as go
 
 from pulp import LpMaximize, LpProblem, LpStatus, lpSum, LpVariable
 
@@ -79,3 +80,43 @@ for var in model.variables():
 # Вывод ограничений
 # for name, constraint in model.constraints.items():
 #     print(f"{name}: {constraint.value()}")
+
+# Визуализация данных
+allT = []
+for i in range(0, countRequests):
+    allT.append(T[i])
+    allT.append(deltaT[i])
+
+fig = go.Figure()
+for b in range(0, countBunkers):
+    thisY = []
+    for i in range(0, countRequests):
+        if x[b, i].varValue == 1:
+            thisY.append(b)
+            thisY.append(b)
+        else:
+            thisY.append(None)
+            thisY.append(None)
+
+    fig.add_trace(go.Scatter(
+        x=allT,
+        y=thisY,
+        name=f'Bunker {b + 1}',
+        line=dict(width=40)
+
+    ))
+fig.update_layout(
+    yaxis=dict(
+        tickmode='array',
+        tickvals=[b for b in range(0, countBunkers)],
+        ticktext=[f'Bunker {b + 1}' for b in range(0, countBunkers)],
+    ),
+    xaxis=dict(
+        tickmode='array',
+        tickvals=allT
+    )
+)
+for i in range(len(allT)):
+    fig.add_vline(x=allT[i], line_width=2, line_dash="dot", line_color="SkyBlue")
+fig.update_layout(legend_orientation="h")
+fig.show()
